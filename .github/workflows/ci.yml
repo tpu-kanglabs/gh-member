@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Setup mise
+        uses: jdx/mise-action@v4
+      - name: Lint
+        run: mise run lint
+      - name: Check format
+        run: mise run format
+      - name: Build
+        run: mise run build
