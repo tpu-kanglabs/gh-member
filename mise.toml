@@ -1,0 +1,14 @@
+[tools]
+go = "1.21"
+golangci-lint = "v2.12.2"
+
+[tasks.build]
+run = "go build ."
+[tasks.install]
+run = "gh extension install ."
+[tasks.remove]
+run = "gh extension remove member"
+[tasks.format]
+run = "golangci-lint fmt"
+[tasks.lint]
+run = "golangci-lint run"
