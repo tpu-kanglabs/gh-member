@@ -11,12 +11,7 @@ type GraphQLDoer interface {
 	DoWithContext(ctx context.Context, query string, variables map[string]interface{}, response interface{}) error
 }
 
-// defaultClient は api.DefaultGraphQLClient を返す（本番用）。
-func defaultClient() (GraphQLDoer, error) {
-	return api.DefaultGraphQLClient()
-}
-
-// NewDefaultClient は api.DefaultGraphQLClient を返す（外部パッケージから利用可能）。
+// NewDefaultClient は api.DefaultGraphQLClient を返す。
 func NewDefaultClient() (GraphQLDoer, error) {
 	return api.DefaultGraphQLClient()
 }

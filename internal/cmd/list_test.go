@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -113,5 +114,36 @@ func TestListCmd_ParseJSON(t *testing.T) {
 
 	if got := cmd.Flags().Lookup("json").Value.String(); got != "login,role,url" {
 		t.Errorf("--json value = %q, want %q", got, "login,role,url")
+	}
+}
+
+// --- RunE integration tests ---
+
+// TestListCmd_InvalidRole verifies that an invalid --role value returns an error
+// without making any API call.
+func TestListCmd_InvalidRole(t *testing.T) {
+	cmd := newListCmd()
+	cmd.SetArgs([]string{"--role", "superuser", "myorg"})
+
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("expected error for invalid --role, got nil")
+	}
+	if !strings.Contains(err.Error(), "invalid role") {
+		t.Errorf("expected 'invalid role' in error message, got: %v", err)
+	}
+}
+
+// TestListCmd_OrgRequiredStructuredMode verifies that --json without org returns an error.
+func TestListCmd_OrgRequiredStructuredMode(t *testing.T) {
+	cmd := newListCmd()
+	cmd.SetArgs([]string{"--json", "login,role"}) // no org
+
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("expected error when org is missing in structured mode, got nil")
+	}
+	if !strings.Contains(err.Error(), "organization is required") {
+		t.Errorf("expected 'organization is required' in error message, got: %v", err)
 	}
 }

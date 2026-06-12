@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -95,12 +96,19 @@ func (m memberTableModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if row != nil && len(row) >= 4 {
 				url := row[3]
 				b := browser.New("", os.Stdout, os.Stderr)
-				_ = b.Browse(url)
+				if err := b.Browse(url); err != nil {
+					fmt.Fprintf(os.Stderr, "error opening browser: %v\n", err)
+				}
 			}
 			return m, nil
 
-		case "ctrl+c", "q", "esc":
+		case "ctrl+c", "esc":
 			return m, tea.Quit
+		case "q":
+			// Quit only when the search box is empty; otherwise pass to textinput.
+			if m.search.Value() == "" {
+				return m, tea.Quit
+			}
 
 		default:
 			prevQuery := m.search.Value()
@@ -130,7 +138,7 @@ func (m memberTableModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m memberTableModel) View() string {
-	footer := " ↑/↓: move  enter: open profile  q: quit"
+	footer := " ↑/↓: move  enter: open profile  q: quit (when search empty)  esc: quit"
 	return m.search.View() + "\n" + tableStyle.Render(m.table.View()) + "\n" + footer
 }
 

@@ -15,8 +15,16 @@ type orgItem struct {
 	name  string
 }
 
-func (i orgItem) Title() string       { return i.login }
-func (i orgItem) Description() string { return i.name }
+// Title shows the human-readable name first (more recognizable); falls back to login.
+func (i orgItem) Title() string {
+	if i.name != "" {
+		return i.name
+	}
+	return i.login
+}
+
+// Description shows the login handle below the name.
+func (i orgItem) Description() string { return i.login }
 func (i orgItem) FilterValue() string { return i.login }
 
 // orgSelectModel は Bubble Tea のモデル。

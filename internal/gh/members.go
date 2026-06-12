@@ -55,7 +55,10 @@ func FetchMembers(ctx context.Context, client GraphQLDoer, org string, limit int
 			if remaining <= 0 {
 				break
 			}
-			if remaining < pageSize {
+			// When a role filter is active, unfiltered API results count towards
+			// the page but not towards the limit, so always fetch a full page to
+			// avoid O(n/adminRatio) round-trips on sparse populations.
+			if strings.ToLower(role) == "all" && remaining < pageSize {
 				pageSize = remaining
 			}
 		}
