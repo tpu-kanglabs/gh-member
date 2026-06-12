@@ -1,4 +1,4 @@
-module github.com/rmuraix/gh-member
+module github.com/tpu-kanglabs/gh-member
 
 go 1.25.0
 
