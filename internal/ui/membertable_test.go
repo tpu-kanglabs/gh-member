@@ -8,7 +8,7 @@ import (
 	"github.com/rmuraix/gh-member/internal/gh"
 )
 
-// TestFilterMembers_Empty: query="" で全件返ること
+// TestFilterMembers_Empty: an empty query returns all members.
 func TestFilterMembers_Empty(t *testing.T) {
 	members := []gh.Member{
 		{Name: "Alice", Login: "alice", Role: "MEMBER", URL: "https://github.com/alice"},
@@ -21,7 +21,7 @@ func TestFilterMembers_Empty(t *testing.T) {
 	}
 }
 
-// TestFilterMembers_Match: query で Name/Login に部分一致する行のみ返ること
+// TestFilterMembers_Match: only members whose Name or Login contains the query are returned.
 func TestFilterMembers_Match(t *testing.T) {
 	members := []gh.Member{
 		{Name: "Alice Smith", Login: "asmith", Role: "MEMBER", URL: "https://github.com/asmith"},
@@ -74,7 +74,7 @@ func TestFilterMembers_Match(t *testing.T) {
 	})
 }
 
-// TestMembersToRows_EmptyName: Name 空のとき Login が表示されること
+// TestMembersToRows_EmptyName: when Name is empty, the NAME column shows Login instead.
 func TestMembersToRows_EmptyName(t *testing.T) {
 	members := []gh.Member{
 		{Name: "", Login: "noname", Role: "MEMBER", URL: "https://github.com/noname"},
@@ -86,26 +86,26 @@ func TestMembersToRows_EmptyName(t *testing.T) {
 		t.Fatalf("expected 2 rows, got %d", len(rows))
 	}
 
-	// Name が空のとき Login が NAME 列に表示される
+	// Empty Name: Login is shown in the NAME column.
 	if rows[0][0] != "noname" {
 		t.Errorf("expected NAME column to be %q, got %q", "noname", rows[0][0])
 	}
 
-	// Name がある場合は Name が表示される
+	// Non-empty Name: Name is shown.
 	if rows[1][0] != "HasName" {
 		t.Errorf("expected NAME column to be %q, got %q", "HasName", rows[1][0])
 	}
 }
 
-// TestBuildColumns_ProfileWidth: buildColumns の PROFILE 列幅計算をテスト
+// TestBuildColumns_ProfileWidth: verifies PROFILE column width calculation in buildColumns.
 func TestBuildColumns_ProfileWidth(t *testing.T) {
-	// windowWidth=0 → デフォルト幅(20)
+	// windowWidth=0 → default width (20)
 	cols := buildColumns(0)
 	if cols[3].Width != 20 {
 		t.Errorf("windowWidth=0: expected PROFILE width 20, got %d", cols[3].Width)
 	}
 
-	// windowWidth=52 ちょうど（名前20+ID20+ロール8+パディング4=52）→ デフォルト幅(20)
+	// windowWidth=52 exactly (name20+id20+role8+padding4=52) → default width (20)
 	cols = buildColumns(52)
 	if cols[3].Width != 20 {
 		t.Errorf("windowWidth=52: expected PROFILE width 20, got %d", cols[3].Width)
@@ -118,7 +118,7 @@ func TestBuildColumns_ProfileWidth(t *testing.T) {
 	}
 }
 
-// TestMemberTableModel_SearchFiltersRows: 検索テキスト入力でテーブル行が絞り込まれること
+// TestMemberTableModel_SearchFiltersRows: typing in the search box filters the table rows.
 func TestMemberTableModel_SearchFiltersRows(t *testing.T) {
 	members := []gh.Member{
 		{Name: "Alice", Login: "alice", Role: "MEMBER", URL: "https://github.com/alice"},
@@ -126,24 +126,23 @@ func TestMemberTableModel_SearchFiltersRows(t *testing.T) {
 	}
 	m := newMemberTableModel(members)
 
-	// 初期状態では全件表示
+	// Initially all rows are shown.
 	if len(m.table.Rows()) != 2 {
 		t.Fatalf("initial: expected 2 rows, got %d", len(m.table.Rows()))
 	}
 
-	// 'a' を入力 → "alice" のみ一致
+	// Typing 'a' matches "Alice" but not "Bob".
 	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("a")})
 	m2, ok := updated.(memberTableModel)
 	if !ok {
 		t.Fatal("Update did not return memberTableModel")
 	}
-	// "Alice" は Name に "a" を含む、"Bob" は含まない
 	if len(m2.table.Rows()) != 1 {
 		t.Errorf("after typing 'a': expected 1 row, got %d", len(m2.table.Rows()))
 	}
 }
 
-// TestMemberTableModel_QuitOnQ: q キーで done になること（Update をテスト）
+// TestMemberTableModel_QuitOnQ: pressing q when the search box is empty returns a Quit command.
 func TestMemberTableModel_QuitOnQ(t *testing.T) {
 	members := []gh.Member{
 		{Name: "Alice", Login: "alice", Role: "MEMBER", URL: "https://github.com/alice"},
@@ -156,7 +155,7 @@ func TestMemberTableModel_QuitOnQ(t *testing.T) {
 		t.Fatal("expected a command to be returned for q key")
 	}
 
-	// tea.Quit を確認するには cmd() の戻り値が tea.QuitMsg であることを確認する
+	// Confirm the returned command is tea.Quit by inspecting its message type.
 	msg := cmd()
 	if _, ok := msg.(tea.QuitMsg); !ok {
 		t.Errorf("expected tea.QuitMsg, got %T", msg)

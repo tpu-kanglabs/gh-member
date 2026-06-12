@@ -32,8 +32,7 @@ type orgsResponse struct {
 	}
 }
 
-// FetchViewerOrgs は認証ユーザーが参加している org を最大 limit 件取得する。
-// limit < 0 で全件。limit=0 の場合は0件を返す（取得しない）。
+// FetchViewerOrgs fetches the organizations the authenticated user belongs to, up to limit items (limit < 0 means all).
 func FetchViewerOrgs(ctx context.Context, client GraphQLDoer, limit int) ([]Org, error) {
 	var orgs []Org
 	var cursor string

@@ -9,7 +9,7 @@ import (
 	"github.com/rmuraix/gh-member/internal/gh"
 )
 
-// orgItem は bubbles/list のアイテム型。
+// orgItem implements list.Item for a GitHub Organization.
 type orgItem struct {
 	login string
 	name  string
@@ -27,7 +27,7 @@ func (i orgItem) Title() string {
 func (i orgItem) Description() string { return i.login }
 func (i orgItem) FilterValue() string { return i.login }
 
-// orgSelectModel は Bubble Tea のモデル。
+// orgSelectModel is the Bubble Tea model for the org selector.
 type orgSelectModel struct {
 	list   list.Model
 	chosen string
@@ -77,10 +77,9 @@ func (m orgSelectModel) View() string {
 	return m.list.View()
 }
 
-// SelectOrg はユーザーが参加している org 一覧を対話的に選択させる。
-// 選択された org の Login を返す。
-// ユーザーが q/Ctrl+C/Esc でキャンセルした場合は空文字列と nil を返す。
-// orgs が空の場合はエラー "no organizations found" を返す。
+// SelectOrg shows an interactive list of orgs and returns the login of the chosen one.
+// Returns an empty string and nil when the user cancels with q/Ctrl+C/Esc.
+// Returns an error if orgs is empty.
 func SelectOrg(orgs []gh.Org) (string, error) {
 	if len(orgs) == 0 {
 		return "", errors.New("no organizations found")

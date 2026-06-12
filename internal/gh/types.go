@@ -1,15 +1,15 @@
 package gh
 
-// Member は Organization のメンバーを表す。
+// Member represents a member of a GitHub Organization.
 type Member struct {
-	Name       string // 空の場合は Login を使う（表示層で処理）
+	Name       string // empty when not set; presentation layer falls back to Login
 	Login      string
 	Role       string // "ADMIN" or "MEMBER"
 	DatabaseID int
 	URL        string
 }
 
-// Org は viewer が参加している Organization を表す。
+// Org represents a GitHub Organization the authenticated user belongs to.
 type Org struct {
 	Login string
 	Name  string

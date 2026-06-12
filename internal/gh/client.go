@@ -6,12 +6,12 @@ import (
 	"github.com/cli/go-gh/v2/pkg/api"
 )
 
-// GraphQLDoer は GraphQL クエリを実行するインターフェース（テスト注入用）。
+// GraphQLDoer executes a GraphQL query. Defined as an interface to allow test injection.
 type GraphQLDoer interface {
 	DoWithContext(ctx context.Context, query string, variables map[string]interface{}, response interface{}) error
 }
 
-// NewDefaultClient は api.DefaultGraphQLClient を返す。
+// NewDefaultClient returns the default GraphQL client backed by the active gh login session.
 func NewDefaultClient() (GraphQLDoer, error) {
 	return api.DefaultGraphQLClient()
 }

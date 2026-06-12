@@ -7,7 +7,7 @@ import (
 	"github.com/rmuraix/gh-member/internal/gh"
 )
 
-// TestFetchViewerOrgs_Basic は正常取得をテストする。
+// TestFetchViewerOrgs_Basic tests successful retrieval of organizations.
 func TestFetchViewerOrgs_Basic(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -51,7 +51,7 @@ func TestFetchViewerOrgs_Basic(t *testing.T) {
 	}
 }
 
-// TestFetchViewerOrgs_Pagination はページングありの取得をテストする。
+// TestFetchViewerOrgs_Pagination tests retrieval across multiple pages.
 func TestFetchViewerOrgs_Pagination(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -112,7 +112,7 @@ func TestFetchViewerOrgs_Pagination(t *testing.T) {
 	}
 }
 
-// TestFetchViewerOrgs_Limit は limit による打ち切りをテストする。
+// TestFetchViewerOrgs_Limit tests that fetching stops once the limit is reached.
 func TestFetchViewerOrgs_Limit(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -153,7 +153,7 @@ func TestFetchViewerOrgs_Limit(t *testing.T) {
 		t.Errorf("expected org2, got %s", orgs[1].Login)
 	}
 
-	// 2件取得できたので追加のページングは不要
+	// 2 orgs fetched; no further page request expected
 	if transport.callCount != 1 {
 		t.Errorf("expected 1 API call, got %d", transport.callCount)
 	}

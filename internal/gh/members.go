@@ -40,10 +40,8 @@ type membersResponse struct {
 	}
 }
 
-// FetchMembers は org のメンバーを取得する。
-// limit < 0 の場合は全件取得。limit >= 0 の場合は最大 limit 件。
-// limit=0 の場合は0件を返す（取得しない）。
-// role は "all", "admin", "member" を受け付け、クライアント側でフィルタリングする。
+// FetchMembers fetches members of org up to limit items (limit < 0 means all).
+// role accepts "all", "admin", or "member" and is filtered client-side.
 func FetchMembers(ctx context.Context, client GraphQLDoer, org string, limit int, role string) ([]Member, error) {
 	var members []Member
 	var cursor string
@@ -78,8 +76,7 @@ func FetchMembers(ctx context.Context, client GraphQLDoer, org string, limit int
 
 		mwr := resp.Organization.MembersWithRole
 		for _, edge := range mwr.Edges {
-			// role フィルタリング（クライアント側）
-			if !matchRole(edge.Role, role) {
+				if !matchRole(edge.Role, role) {
 				continue
 			}
 
@@ -109,14 +106,14 @@ func FetchMembers(ctx context.Context, client GraphQLDoer, org string, limit int
 	return members, nil
 }
 
-// matchRole は edge の role が指定の role フィルタにマッチするか確認する。
+// matchRole reports whether edgeRole satisfies the given filter.
 func matchRole(edgeRole, filter string) bool {
 	switch strings.ToLower(filter) {
 	case "admin":
 		return edgeRole == "ADMIN"
 	case "member":
 		return edgeRole == "MEMBER"
-	default: // "all" またはその他
+	default: // "all" or unknown
 		return true
 	}
 }

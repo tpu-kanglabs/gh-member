@@ -12,7 +12,7 @@ import (
 	"github.com/rmuraix/gh-member/internal/gh"
 )
 
-// mockTransport は GraphQL レスポンスをモックする http.RoundTripper。
+// mockTransport is an http.RoundTripper that returns pre-registered responses.
 type mockTransport struct {
 	responses []mockResponse
 	callCount int
@@ -49,7 +49,7 @@ func newTestGraphQLClient(t *testing.T, transport http.RoundTripper) gh.GraphQLD
 	return client
 }
 
-// TestFetchMembers_SinglePage はページングなし（1ページで全件収まる場合）の正常取得をテストする。
+// TestFetchMembers_SinglePage tests successful retrieval when all results fit in a single page.
 func TestFetchMembers_SinglePage(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -107,7 +107,7 @@ func TestFetchMembers_SinglePage(t *testing.T) {
 	}
 }
 
-// TestFetchMembers_Pagination はページングあり（2ページ以上）の正常取得をテストする。
+// TestFetchMembers_Pagination tests successful retrieval across multiple pages.
 func TestFetchMembers_Pagination(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -170,7 +170,7 @@ func TestFetchMembers_Pagination(t *testing.T) {
 	}
 }
 
-// TestFetchMembers_Limit は limit による打ち切りをテストする。
+// TestFetchMembers_Limit tests that fetching stops once the limit is reached.
 func TestFetchMembers_Limit(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -212,13 +212,13 @@ func TestFetchMembers_Limit(t *testing.T) {
 		t.Errorf("expected bob, got %s", members[1].Login)
 	}
 
-	// 2件取得できたので追加のページングは不要
+	// 2 members fetched; no further page request expected
 	if transport.callCount != 1 {
 		t.Errorf("expected 1 API call, got %d", transport.callCount)
 	}
 }
 
-// TestFetchMembers_RoleFilter は role フィルタ（admin のみ抽出）をテストする。
+// TestFetchMembers_RoleFilter tests that only admin members are returned when role="admin".
 func TestFetchMembers_RoleFilter(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -267,7 +267,7 @@ func TestFetchMembers_RoleFilter(t *testing.T) {
 	}
 }
 
-// TestFetchMembers_EmptyName は Name が空のときに空文字列が入ることをテストする。
+// TestFetchMembers_EmptyName tests that an empty Name from the API is stored as an empty string.
 func TestFetchMembers_EmptyName(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -300,7 +300,7 @@ func TestFetchMembers_EmptyName(t *testing.T) {
 		t.Fatalf("expected 1 member, got %d", len(members))
 	}
 
-	// Name は空文字列のまま保持される（表示層でフォールバック処理）
+	// Name is preserved as an empty string; the presentation layer handles the fallback.
 	if members[0].Name != "" {
 		t.Errorf("expected empty name, got %q", members[0].Name)
 	}
@@ -309,7 +309,7 @@ func TestFetchMembers_EmptyName(t *testing.T) {
 	}
 }
 
-// TestFetchMembers_ErrorResponse は org 不存在・権限不足のエラーレスポンス時の適切なエラー返しをテストする。
+// TestFetchMembers_ErrorResponse tests that a GraphQL error (e.g. org not found) is returned as an error.
 func TestFetchMembers_ErrorResponse(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{
@@ -328,11 +328,11 @@ func TestFetchMembers_ErrorResponse(t *testing.T) {
 	client := newTestGraphQLClient(t, transport)
 	_, err := gh.FetchMembers(context.Background(), client, "nonexistent", -1, "all")
 	if err == nil {
-		t.Fatal("エラーが期待されたが、nil が返った")
+		t.Fatal("expected an error but got nil")
 	}
 }
 
-// TestFetchMembers_MemberRoleFilter は role フィルタ（member のみ抽出）をテストする。
+// TestFetchMembers_MemberRoleFilter tests that only member-role members are returned when role="member".
 func TestFetchMembers_MemberRoleFilter(t *testing.T) {
 	transport := &mockTransport{
 		responses: []mockResponse{

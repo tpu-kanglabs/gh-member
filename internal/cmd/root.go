@@ -9,7 +9,7 @@ var rootCmd = &cobra.Command{
 	Short: "Manage GitHub Organization members",
 }
 
-// Execute はルートコマンドを実行する。main.go から呼ぶ。
+// Execute runs the root command.
 func Execute() error {
 	return rootCmd.Execute()
 }

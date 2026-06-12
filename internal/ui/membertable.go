@@ -23,7 +23,7 @@ var (
 			BorderForeground(lipgloss.Color("240"))
 )
 
-// memberTableModel は Bubble Tea のモデル。
+// memberTableModel is the Bubble Tea model for the member table browser.
 type memberTableModel struct {
 	allMembers  []gh.Member
 	table       table.Model
@@ -142,9 +142,8 @@ func (m memberTableModel) View() string {
 	return m.search.View() + "\n" + tableStyle.Render(m.table.View()) + "\n" + footer
 }
 
-// filterMembers は query に部分一致する members を返す（大文字小文字無視）。
-// Name または Login のどちらかに query が含まれれば一致。
-// query が空なら全件返す。
+// filterMembers returns members whose Name or Login contains query (case-insensitive).
+// Returns all members when query is empty.
 func filterMembers(members []gh.Member, query string) []gh.Member {
 	if query == "" {
 		return members
@@ -160,7 +159,7 @@ func filterMembers(members []gh.Member, query string) []gh.Member {
 	return result
 }
 
-// membersToRows は []gh.Member を []table.Row に変換する。
+// membersToRows converts a []gh.Member slice to []table.Row.
 func membersToRows(members []gh.Member) []table.Row {
 	rows := make([]table.Row, 0, len(members))
 	for _, m := range members {
@@ -173,12 +172,8 @@ func membersToRows(members []gh.Member) []table.Row {
 	return rows
 }
 
-// BrowseMembers はメンバー一覧を Bubble Tea テーブルで表示する。
-// - textinput で上部に検索ボックスを表示し、タイプで絞り込み（Name または Login に部分一致）
-// - テーブル列: NAME | ID | ROLE | PROFILE (URL)
-// - Enter キーで選択された行のプロフィール URL をブラウザで開く
-// - q / Esc / Ctrl+C で終了
-// - ウィンドウサイズに応じてテーブル幅が変わる
+// BrowseMembers displays the member list in an interactive Bubble Tea table.
+// Type to filter by Name or Login; Enter opens the selected profile URL in a browser; q/Esc/Ctrl+C quits.
 func BrowseMembers(members []gh.Member) error {
 	m := newMemberTableModel(members)
 	p := tea.NewProgram(m, tea.WithAltScreen())
