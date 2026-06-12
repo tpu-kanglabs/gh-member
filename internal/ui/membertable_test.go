@@ -1,0 +1,164 @@
+package ui
+
+import (
+	"testing"
+
+	tea "github.com/charmbracelet/bubbletea"
+
+	"github.com/rmuraix/gh-member/internal/gh"
+)
+
+// TestFilterMembers_Empty: query="" で全件返ること
+func TestFilterMembers_Empty(t *testing.T) {
+	members := []gh.Member{
+		{Name: "Alice", Login: "alice", Role: "MEMBER", URL: "https://github.com/alice"},
+		{Name: "Bob", Login: "bob", Role: "ADMIN", URL: "https://github.com/bob"},
+	}
+
+	result := filterMembers(members, "")
+	if len(result) != len(members) {
+		t.Errorf("expected %d members, got %d", len(members), len(result))
+	}
+}
+
+// TestFilterMembers_Match: query で Name/Login に部分一致する行のみ返ること
+func TestFilterMembers_Match(t *testing.T) {
+	members := []gh.Member{
+		{Name: "Alice Smith", Login: "asmith", Role: "MEMBER", URL: "https://github.com/asmith"},
+		{Name: "Bob Jones", Login: "bjones", Role: "ADMIN", URL: "https://github.com/bjones"},
+		{Name: "", Login: "charlie", Role: "MEMBER", URL: "https://github.com/charlie"},
+	}
+
+	t.Run("match by Name", func(t *testing.T) {
+		result := filterMembers(members, "Alice")
+		if len(result) != 1 {
+			t.Errorf("expected 1 result, got %d", len(result))
+		}
+		if result[0].Login != "asmith" {
+			t.Errorf("expected login %q, got %q", "asmith", result[0].Login)
+		}
+	})
+
+	t.Run("match by Login", func(t *testing.T) {
+		result := filterMembers(members, "bjones")
+		if len(result) != 1 {
+			t.Errorf("expected 1 result, got %d", len(result))
+		}
+		if result[0].Login != "bjones" {
+			t.Errorf("expected login %q, got %q", "bjones", result[0].Login)
+		}
+	})
+
+	t.Run("case insensitive", func(t *testing.T) {
+		result := filterMembers(members, "ALICE")
+		if len(result) != 1 {
+			t.Errorf("expected 1 result, got %d", len(result))
+		}
+	})
+
+	t.Run("no match", func(t *testing.T) {
+		result := filterMembers(members, "xyz-no-match")
+		if len(result) != 0 {
+			t.Errorf("expected 0 results, got %d", len(result))
+		}
+	})
+
+	t.Run("match in Login when Name is empty", func(t *testing.T) {
+		result := filterMembers(members, "charlie")
+		if len(result) != 1 {
+			t.Errorf("expected 1 result, got %d", len(result))
+		}
+		if result[0].Login != "charlie" {
+			t.Errorf("expected login %q, got %q", "charlie", result[0].Login)
+		}
+	})
+}
+
+// TestMembersToRows_EmptyName: Name 空のとき Login が表示されること
+func TestMembersToRows_EmptyName(t *testing.T) {
+	members := []gh.Member{
+		{Name: "", Login: "noname", Role: "MEMBER", URL: "https://github.com/noname"},
+		{Name: "HasName", Login: "hasname", Role: "ADMIN", URL: "https://github.com/hasname"},
+	}
+
+	rows := membersToRows(members)
+	if len(rows) != 2 {
+		t.Fatalf("expected 2 rows, got %d", len(rows))
+	}
+
+	// Name が空のとき Login が NAME 列に表示される
+	if rows[0][0] != "noname" {
+		t.Errorf("expected NAME column to be %q, got %q", "noname", rows[0][0])
+	}
+
+	// Name がある場合は Name が表示される
+	if rows[1][0] != "HasName" {
+		t.Errorf("expected NAME column to be %q, got %q", "HasName", rows[1][0])
+	}
+}
+
+// TestBuildColumns_ProfileWidth: buildColumns の PROFILE 列幅計算をテスト
+func TestBuildColumns_ProfileWidth(t *testing.T) {
+	// windowWidth=0 → デフォルト幅(20)
+	cols := buildColumns(0)
+	if cols[3].Width != 20 {
+		t.Errorf("windowWidth=0: expected PROFILE width 20, got %d", cols[3].Width)
+	}
+
+	// windowWidth=52 ちょうど（名前20+ID20+ロール8+パディング4=52）→ デフォルト幅(20)
+	cols = buildColumns(52)
+	if cols[3].Width != 20 {
+		t.Errorf("windowWidth=52: expected PROFILE width 20, got %d", cols[3].Width)
+	}
+
+	// windowWidth=100 → 100-20-20-8-4=48
+	cols = buildColumns(100)
+	if cols[3].Width != 48 {
+		t.Errorf("windowWidth=100: expected PROFILE width 48, got %d", cols[3].Width)
+	}
+}
+
+// TestMemberTableModel_SearchFiltersRows: 検索テキスト入力でテーブル行が絞り込まれること
+func TestMemberTableModel_SearchFiltersRows(t *testing.T) {
+	members := []gh.Member{
+		{Name: "Alice", Login: "alice", Role: "MEMBER", URL: "https://github.com/alice"},
+		{Name: "Bob", Login: "bob", Role: "ADMIN", URL: "https://github.com/bob"},
+	}
+	m := newMemberTableModel(members)
+
+	// 初期状態では全件表示
+	if len(m.table.Rows()) != 2 {
+		t.Fatalf("initial: expected 2 rows, got %d", len(m.table.Rows()))
+	}
+
+	// 'a' を入力 → "alice" のみ一致
+	updated, _ := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("a")})
+	m2, ok := updated.(memberTableModel)
+	if !ok {
+		t.Fatal("Update did not return memberTableModel")
+	}
+	// "Alice" は Name に "a" を含む、"Bob" は含まない
+	if len(m2.table.Rows()) != 1 {
+		t.Errorf("after typing 'a': expected 1 row, got %d", len(m2.table.Rows()))
+	}
+}
+
+// TestMemberTableModel_QuitOnQ: q キーで done になること（Update をテスト）
+func TestMemberTableModel_QuitOnQ(t *testing.T) {
+	members := []gh.Member{
+		{Name: "Alice", Login: "alice", Role: "MEMBER", URL: "https://github.com/alice"},
+	}
+
+	m := newMemberTableModel(members)
+
+	_, cmd := m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("q")})
+	if cmd == nil {
+		t.Fatal("expected a command to be returned for q key")
+	}
+
+	// tea.Quit を確認するには cmd() の戻り値が tea.QuitMsg であることを確認する
+	msg := cmd()
+	if _, ok := msg.(tea.QuitMsg); !ok {
+		t.Errorf("expected tea.QuitMsg, got %T", msg)
+	}
+}
