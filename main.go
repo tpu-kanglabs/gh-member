@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rmuraix/gh-member/internal/cmd"
+	"github.com/tpu-kanglabs/gh-member/internal/cmd"
 )
 
 func main() {

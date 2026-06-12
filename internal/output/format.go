@@ -8,7 +8,7 @@ import (
 	"github.com/cli/go-gh/v2/pkg/jq"
 	"github.com/cli/go-gh/v2/pkg/tableprinter"
 	"github.com/cli/go-gh/v2/pkg/template"
-	"github.com/rmuraix/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
 )
 
 // PrintTable prints members as a table.

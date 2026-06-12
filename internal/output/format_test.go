@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rmuraix/gh-member/internal/gh"
-	"github.com/rmuraix/gh-member/internal/output"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/output"
 )
 
 // testMembers is a shared set of test members.

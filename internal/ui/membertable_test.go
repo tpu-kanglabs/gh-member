@@ -5,7 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/rmuraix/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
 )
 
 // TestFilterMembers_Empty: an empty query returns all members.
