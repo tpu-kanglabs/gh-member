@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/cli/go-gh/v2/pkg/api"
-	"github.com/rmuraix/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
 )
 
 // mockTransport is an http.RoundTripper that returns pre-registered responses.

@@ -13,9 +13,9 @@ import (
 	"github.com/spf13/cobra"
 	xterm "golang.org/x/term" // for terminal width
 
-	"github.com/rmuraix/gh-member/internal/gh"
-	"github.com/rmuraix/gh-member/internal/output"
-	"github.com/rmuraix/gh-member/internal/ui"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/output"
+	"github.com/tpu-kanglabs/gh-member/internal/ui"
 )
 
 // newClientFn is the factory used to create the GraphQL client.

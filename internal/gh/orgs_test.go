@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rmuraix/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
 )
 
 // TestFetchViewerOrgs_Basic tests successful retrieval of organizations.

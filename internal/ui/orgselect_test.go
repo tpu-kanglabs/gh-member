@@ -5,7 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/rmuraix/gh-member/internal/gh"
+	"github.com/tpu-kanglabs/gh-member/internal/gh"
 )
 
 // TestOrgSelectModel_EnterSelectsItem: pressing Enter with at least one item sets done=true and chosen.
