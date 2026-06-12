@@ -93,7 +93,7 @@ func (m memberTableModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "enter":
 			row := m.table.SelectedRow()
-			if row != nil && len(row) >= 4 {
+			if len(row) >= 4 {
 				url := row[3]
 				b := browser.New("", os.Stdout, os.Stderr)
 				if err := b.Browse(url); err != nil {

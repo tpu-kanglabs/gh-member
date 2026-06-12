@@ -32,7 +32,7 @@ type membersResponse struct {
 				Node struct {
 					Name       string
 					Login      string
-					DatabaseID int `json:"databaseId"`
+					DatabaseID int    `json:"databaseId"`
 					URL        string `json:"url"`
 				}
 			}
@@ -76,7 +76,7 @@ func FetchMembers(ctx context.Context, client GraphQLDoer, org string, limit int
 
 		mwr := resp.Organization.MembersWithRole
 		for _, edge := range mwr.Edges {
-				if !matchRole(edge.Role, role) {
+			if !matchRole(edge.Role, role) {
 				continue
 			}
 

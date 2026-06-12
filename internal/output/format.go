@@ -64,7 +64,7 @@ func PrintJSON(w io.Writer, members []gh.Member, fields []string) error {
 					item["databaseId"] = m.DatabaseID
 				case "url":
 					item["url"] = m.URL
-				// unknown fields are silently ignored
+					// unknown fields are silently ignored
 				}
 			}
 			result = append(result, item)
