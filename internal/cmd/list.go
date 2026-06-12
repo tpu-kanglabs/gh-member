@@ -18,6 +18,10 @@ import (
 	"github.com/rmuraix/gh-member/internal/ui"
 )
 
+// newClientFn is the factory used to create the GraphQL client.
+// Overridden in tests to inject a fake client without a live GitHub session.
+var newClientFn func() (gh.GraphQLDoer, error) = gh.NewDefaultClient
+
 func newListCmd() *cobra.Command {
 	var (
 		limit    int
@@ -48,7 +52,17 @@ func newListCmd() *cobra.Command {
 			// structured output mode?
 			structuredMode := jsonFlag != "" || jqFilter != "" || tmplStr != ""
 
-			client, err := gh.NewDefaultClient()
+			// Validate org early (before creating client) for deterministic error messages.
+			t := ghterm.FromEnv()
+			isTTY := t.IsTerminalOutput()
+			if structuredMode && org == "" {
+				return errors.New("organization is required when using --json, --jq, or --template")
+			}
+			if !structuredMode && !isTTY && org == "" {
+				return errors.New("organization is required in non-interactive mode")
+			}
+
+			client, err := newClientFn()
 			if err != nil {
 				return fmt.Errorf("create GraphQL client: %w", err)
 			}
@@ -56,11 +70,6 @@ func newListCmd() *cobra.Command {
 			ctx := context.Background()
 
 			if structuredMode {
-				// org is required in structured mode
-				if org == "" {
-					return errors.New("organization is required when using --json, --jq, or --template")
-				}
-
 				members, err := gh.FetchMembers(ctx, client, org, limit, role)
 				if err != nil {
 					return err
@@ -90,9 +99,7 @@ func newListCmd() *cobra.Command {
 			}
 
 			// non-structured mode
-			t := ghterm.FromEnv()
-
-			if t.IsTerminalOutput() {
+			if isTTY {
 				// TUI mode
 				if org == "" {
 					orgs, err := gh.FetchViewerOrgs(ctx, client, 100)
@@ -119,16 +126,12 @@ func newListCmd() *cobra.Command {
 			}
 
 			// static table mode (non-TTY)
-			if org == "" {
-				return errors.New("organization is required in non-interactive mode")
-			}
-
 			members, err := gh.FetchMembers(ctx, client, org, limit, role)
 			if err != nil {
 				return err
 			}
 
-			return output.PrintTable(t.Out(), t.IsTerminalOutput(), termWidth(), members)
+			return output.PrintTable(t.Out(), isTTY, termWidth(), members)
 		},
 	}
 

@@ -3,7 +3,6 @@ package output
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 
 	"github.com/cli/go-gh/v2/pkg/jq"
@@ -26,7 +25,7 @@ func PrintTable(w io.Writer, isTTY bool, maxWidth int, members []gh.Member) erro
 			name = m.Login
 		}
 		tp.AddField(name)
-		tp.AddField(fmt.Sprintf("%d", m.DatabaseID))
+		tp.AddField(m.Login)
 		tp.AddField(m.Role)
 		tp.AddField(m.URL)
 		tp.EndRow()
@@ -65,7 +64,7 @@ func PrintJSON(w io.Writer, members []gh.Member, fields []string) error {
 					item["databaseId"] = m.DatabaseID
 				case "url":
 					item["url"] = m.URL
-				// unknown fields are silently ignored
+					// unknown fields are silently ignored
 				}
 			}
 			result = append(result, item)

@@ -31,3 +31,5 @@ jobs:
         run: mise run format
       - name: Build
         run: mise run build
+      - name: Test
+        run: mise run test

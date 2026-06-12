@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `gh-member` is a GitHub CLI (`gh`) extension for managing GitHub Organization members. It is written in Go and communicates with the GitHub API via `github.com/cli/go-gh/v2`.
 
-## Commands
+## Development commands
 
 The task runner is [mise](https://mise.jdx.dev/).
 
@@ -18,8 +18,12 @@ mise run install  # install locally via gh extension install .
 mise run remove   # uninstall via gh extension remove member
 ```
 
+## User-facing commands
+
+For the full description of `gh member` subcommands, flags, output modes, and usage examples, see **[docs/commands.md](docs/commands.md)**.
+
 ## Architecture
 
-- Entry point is `main.go` only — currently a single-file skeleton implementation.
-- GitHub API access uses `api.DefaultRESTClient()`, which automatically picks up the active `gh` login session.
+- Entry point is `main.go` — delegates to `internal/cmd`.
+- GitHub API access uses `api.DefaultGraphQLClient()`, which automatically picks up the active `gh` login session.
 - Releases are triggered by pushing a `v*` tag; `cli/gh-extension-precompile` handles cross-platform builds and generates attestations.

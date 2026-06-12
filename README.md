@@ -16,8 +16,10 @@ gh extension install tpu-kanglabs/gh-member
 ## Usage
 
 ```bash
-gh member
+gh member list [org]
 ```
+
+For full command documentation — tutorials, how-to guides, flag reference, and explanation of output modes — see **[docs/commands.md](docs/commands.md)**.
 
 ### Upgrade
 

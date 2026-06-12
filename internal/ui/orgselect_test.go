@@ -8,7 +8,7 @@ import (
 	"github.com/rmuraix/gh-member/internal/gh"
 )
 
-// TestOrgSelectModel_EnterSelectsItem: list が 1 アイテム以上あるとき Enter で done になること。
+// TestOrgSelectModel_EnterSelectsItem: pressing Enter with at least one item sets done=true and chosen.
 func TestOrgSelectModel_EnterSelectsItem(t *testing.T) {
 	orgs := []gh.Org{
 		{Login: "my-org", Name: "My Organization"},
@@ -30,7 +30,7 @@ func TestOrgSelectModel_EnterSelectsItem(t *testing.T) {
 	}
 }
 
-// TestOrgSelectModel_QuitOnQ: q キーで done になりキャンセルになること。
+// TestOrgSelectModel_QuitOnQ: pressing q sets done=true and leaves chosen empty (cancel).
 func TestOrgSelectModel_QuitOnQ(t *testing.T) {
 	orgs := []gh.Org{
 		{Login: "my-org", Name: "My Organization"},
@@ -52,7 +52,7 @@ func TestOrgSelectModel_QuitOnQ(t *testing.T) {
 	}
 }
 
-// TestOrgSelectModel_EmptyOrgs: orgs が空のとき SelectOrg がエラーを返すこと。
+// TestOrgSelectModel_EmptyOrgs: SelectOrg returns an error when orgs is empty.
 func TestOrgSelectModel_EmptyOrgs(t *testing.T) {
 	_, err := SelectOrg([]gh.Org{})
 	if err == nil {
